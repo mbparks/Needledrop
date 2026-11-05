@@ -1,0 +1,35 @@
+NEEDLEDROP — GREEN SHOE GARAGE
+Version 1.0.0-rc.2
+
+INSTALL
+1. Keep this unzipped folder somewhere permanent.
+2. Open chrome://extensions in desktop Chrome.
+3. Enable Developer mode.
+4. Click Load unpacked. Select this NEEDLEDROP folder (it contains manifest.json).
+5. Pin NEEDLEDROP from Chrome's puzzle-piece menu.
+6. Open a media page and click the record icon.
+
+UPDATING FROM RC1
+Copy the CONTENTS of this new folder into the folder Chrome already
+loads (usually ~/Desktop/NEEDLEDROP/extension), replacing matching files.
+Finish any take first. Click Reload at chrome://extensions and reopen
+the workbench. Keeping the same loaded folder preserves the tape shelf.
+
+USE
+Save MP3 = download an original MP3 found on the page.
+Make MP3 = extract audio from a video/audio file.
+Record tab = record the selected tab's sound as it plays.
+Your tape shelf = preview and save finished files.
+
+No server or account is needed. All conversion stays on your computer.
+Protected-media pages can be tried using Record tab; capture is not guaranteed.
+Chrome may return silence or refuse. Encryption is not removed. File conversions are limited to
+200 MB. Recordings are limited to 60 minutes per take.
+
+This is a release candidate: automated conversion tests pass, but the
+available test browser blocked extension installation, so real Chrome
+tab capture still needs acceptance testing. See TEST-REPORT.md.
+
+Full usage instructions: README.md
+Privacy: PRIVACY.md
+Editable source: this folder

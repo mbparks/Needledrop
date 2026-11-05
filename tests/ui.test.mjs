@@ -1,0 +1,19 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {JSDOM} from 'jsdom';
+import 'fake-indexeddb/auto';
+test('workbench renders untrusted media titles as text and wires download to exact source',async()=>{
+ const dom=new JSDOM(fs.readFileSync(new URL('../studio.html',import.meta.url),'utf8'),{url:'https://extension.test/studio.html'});
+ globalThis.document=dom.window.document;globalThis.confirm=()=>false;
+ const sent=[],intervals=[];const originalInterval=globalThis.setInterval;
+ globalThis.setInterval=(fn)=>{intervals.push(fn);return 1;};
+ globalThis.chrome={runtime:{sendMessage:async m=>{sent.push(m);if(m.type==='source')return {ok:true,source:{id:7,title:'A media page',url:'https://example.com'}};if(m.type==='scan')return {ok:true,protectedMedia:true,items:[{title:'<img src=x onerror=alert(1)>',url:'https://example.com/song.mp3',type:'mp3'}]};if(m.type==='status')return {ok:true,state:{phase:'idle'}};if(m.type==='download')return {ok:true,downloadId:1};throw new Error(m.type);}},storage:{local:{get:async()=>({})}}};
+ await import('../studio.js');
+ for(let i=0;i<50&&!document.querySelector('.media button');i++)await new Promise(r=>setTimeout(r,5));
+ assert.match(document.querySelector('#scan-note').textContent,/You can try Record tab/);
+ assert.equal(document.querySelector('.media strong').textContent,'<img src=x onerror=alert(1)>');assert.equal(document.querySelectorAll('.media img').length,0);
+ document.querySelector('.media button').click();await new Promise(r=>setTimeout(r,10));assert.equal(sent.find(x=>x.type==='download').url,'https://example.com/song.mp3');
+ const filter=document.querySelector('#filter');filter.value='absent';filter.dispatchEvent(new dom.window.Event('input'));assert.equal(document.querySelectorAll('.media').length,0);
+ globalThis.setInterval=originalInterval;dom.window.close();
+});
