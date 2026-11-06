@@ -1,35 +1,36 @@
-NEEDLEDROP — GREEN SHOE GARAGE
-Version 1.0.0-rc.2
+NEEDLEDROP 1.1 RC1 — PASTE A YOUTUBE LINK, GET MP3s
 
-INSTALL
-1. Keep this unzipped folder somewhere permanent.
-2. Open chrome://extensions in desktop Chrome.
-3. Enable Developer mode.
-4. Click Load unpacked. Select this NEEDLEDROP folder (it contains manifest.json).
-5. Pin NEEDLEDROP from Chrome's puzzle-piece menu.
-6. Open a media page and click the record icon.
+1. Unzip this package. Open chrome://extensions in Google Chrome.
+2. Turn on Developer mode > Load unpacked > select NEEDLEDROP.
+   Select the folder that directly contains manifest.json.
+   Do not select the ZIP, its parent folder, or the native subfolder.
 
-UPDATING FROM RC1
-Copy the CONTENTS of this new folder into the folder Chrome already
-loads (usually ~/Desktop/NEEDLEDROP/extension), replacing matching files.
-Finish any take first. Click Reload at chrome://extensions and reopen
-the workbench. Keeping the same loaded folder preserves the tape shelf.
+Already installed? Copy the contents into the folder Chrome already loads,
+replace matching files, then click Reload at chrome://extensions. Keep the
+same installed extension to retain its tape shelf and extension ID.
 
-USE
-Save MP3 = download an original MP3 found on the page.
-Make MP3 = extract audio from a video/audio file.
-Record tab = record the selected tab's sound as it plays.
-Your tape shelf = preview and save finished files.
+ONE-TIME YOUTUBE SETUP (MAC)
+3. Click the NEEDLEDROP toolbar icon. Expand One-time Mac setup.
+4. Click Copy ID, then open Install-Mac.command from this package.
+   Paste the ID when asked. This installs the local downloader using Homebrew.
+   If you don't have Homebrew, install it from https://brew.sh first.
+5. Return to NEEDLEDROP and click Check connection.
 
-No server or account is needed. All conversion stays on your computer.
-Protected-media pages can be tried using Record tab; capture is not guaranteed.
-Chrome may return silence or refuse. Encryption is not removed. File conversions are limited to
-200 MB. Recordings are limited to 60 minutes per take.
+If macOS won't open the script: open Terminal, type bash followed by a space,
+drag Install-Mac.command into that Terminal window, then press Return.
 
-This is a release candidate: automated conversion tests pass, but the
-available test browser blocked extension installation, so real Chrome
-tab capture still needs acceptance testing. See TEST-REPORT.md.
+NOW USE IT
+Paste https://music.youtube.com/watch?v=gSS2IgnnBo8 and click Get MP3.
+Or paste a playlist URL to save individual numbered MP3 files in order.
+Files appear under ~/Downloads/NEEDLEDROP. Use Open folder to find them.
 
-Full usage instructions: README.md
-Privacy: PRIVACY.md
-Editable source: this folder
+Video links that also contain a playlist default to ONE VIDEO. To get their
+playlist, choose Full playlist. The default cap is 100 items; max 500.
+Keep Chrome running until the job finishes. Each job has its own subfolder.
+
+This is a release candidate. Local conversion and automated checks passed;
+live macOS Chrome setup and this YouTube example still need verification.
+Unavailable, private, sign-in-required or DRM-protected sources may fail.
+
+If YouTube changes break downloads: close Chrome and run Update-Mac.command.
+README.md has the full instructions; TEST-REPORT.md lists exact test coverage.

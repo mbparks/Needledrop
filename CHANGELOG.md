@@ -1,3 +1,13 @@
+# 1.1.0-rc.1 — November 5, 2026
+
+- Make pasted YouTube video, YouTube Music and playlist links the primary workflow.
+- Add a per-user Mac native messaging helper powered by yt-dlp and FFmpeg, with Deno for current YouTube extraction support.
+- Save individual MP3s directly into dated folders in Downloads/NEEDLEDROP, with quality selection, playlist ordering and a configurable cap.
+- Show track progress, completed files, partial failures and output location; support cancellation and opening the result folder.
+- Include one-time installer, updater, extension-ID copy control and connection diagnostics.
+- Retain page scanning, local conversion, recording and the tape shelf under More tools.
+- Add URL, native bridge, protocol, subprocess, installer and UI tests. Real local yt-dlp/FFmpeg conversion verified; live YouTube and Mac Chrome acceptance remain outstanding.
+
 # NEEDLEDROP changes
 
 ## 1.0.0-rc.2

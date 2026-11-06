@@ -1,9 +1,49 @@
-# NEEDLEDROP 1.0.0-rc.2 validation
+# NEEDLEDROP 1.1.0-rc.1 validation
 
 Date: November 5, 2026.
 
-RC2 result: all 17 automated tests passed. Live protected-site capture is
-not claimed or verified. The browser's own capture decision is preserved.
+## Current results
+
+- **22 JavaScript checks passed** (17 existing checks plus 5 YouTube/native checks).
+- **8 Python checks passed** against the native helper and installer.
+- Real yt-dlp argument parsing accepted the generated video command and postprocessor settings.
+- Real yt-dlp + system FFmpeg converted the generated `tests/tone.mp4` fixture through the native host command and output parser. For this local test only, the source was replaced by a fixture file URL and the file-URL test option was enabled. Production helper input accepts YouTube hosts only.
+- Independent ffprobe inspection: MP3 codec, two channels, 44,100 Hz, 192,000 bits/sec, title metadata. File bytes confirmed ID3 version 2.3.
+- Existing bundled WebAssembly conversion checks passed using MP4/AAC and WebM/Opus fixtures.
+
+## New coverage
+
+1. Normalize YouTube Music, watch, share and Shorts links; strip tracking parameters; distinguish a single video from an explicit playlist.
+2. Reject unrelated hosts, credential-bearing URLs, invalid IDs, unsupported bitrate and out-of-range playlist limits.
+3. Submit the exact canonical URL/mode/quality/limit from the UI, prevent a second job while busy, expose cancellation and render hostile output titles as text.
+4. Display missing-helper setup with a retry path.
+5. Match native responses by request ID, reuse the port, retain state events and reconnect after disconnect.
+6. Read length-prefixed JSON through fragmented reads; reject oversized, truncated and non-object messages.
+7. Run controlled real child processes to verify success, partial failures, progress, job receipts, concurrent-job rejection and retained completed files after cancellation.
+8. Kill and reap the child when parsing fails; allow a subsequent job after cancellation.
+9. Generate a launcher and Chrome native-host manifest in paths with spaces; verify the single allowed extension origin. Run the generated launcher and exchange a real framed ping message, and reject a different caller origin.
+
+The controlled downloader used for lifecycle tests writes small placeholder files; these tests establish lifecycle behavior, not media validity. The separate real yt-dlp/FFmpeg and WebAssembly checks establish media conversion validity.
+
+## Remaining acceptance checks
+
+The supplied live URL `https://music.youtube.com/watch?v=gSS2IgnnBo8` was attempted with yt-dlp. The connection failed TLS certificate validation in this environment. Certificate verification was not disabled. No claim is made that this particular video was downloaded.
+
+This environment also blocks unpacked Chrome extensions by policy. Live macOS installation, Chrome-to-helper native messaging, workbench-closure continuity and YouTube playlist downloading therefore remain unverified.
+
+On the target Mac:
+
+1. Load the folder directly containing manifest.json; confirm Chrome reports no extension errors.
+2. Open NEEDLEDROP, copy its extension ID and run Install-Mac.command; Check connection must report HELPER CONNECTED.
+3. Paste the supplied video URL, click Get MP3, open the result folder and play the MP3.
+4. Try a public playlist with a limit of 2. Confirm separate numbered MP3s in source order and useful details for unavailable entries.
+5. Start another playlist, cancel after one completed track, and verify that the completed file remains.
+6. Close and reopen only the workbench while a job is active, keeping Chrome running; confirm state and progress continue.
+7. Restart Chrome, check the helper connection, then start another download. Previous files remain on disk; current-job UI history is session-only.
+
+No broad claim of support for every YouTube item, DRM media or login-required content is made.
+
+## Previous workbench coverage
 
 ## Automated checks
 

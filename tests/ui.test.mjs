@@ -6,6 +6,7 @@ import 'fake-indexeddb/auto';
 test('workbench renders untrusted media titles as text and wires download to exact source',async()=>{
  const dom=new JSDOM(fs.readFileSync(new URL('../studio.html',import.meta.url),'utf8'),{url:'https://extension.test/studio.html'});
  globalThis.document=dom.window.document;globalThis.confirm=()=>false;
+ document.querySelector('.advanced').open=true;
  const sent=[],intervals=[];const originalInterval=globalThis.setInterval;
  globalThis.setInterval=(fn)=>{intervals.push(fn);return 1;};
  globalThis.chrome={runtime:{sendMessage:async m=>{sent.push(m);if(m.type==='source')return {ok:true,source:{id:7,title:'A media page',url:'https://example.com'}};if(m.type==='scan')return {ok:true,protectedMedia:true,items:[{title:'<img src=x onerror=alert(1)>',url:'https://example.com/song.mp3',type:'mp3'}]};if(m.type==='status')return {ok:true,state:{phase:'idle'}};if(m.type==='download')return {ok:true,downloadId:1};throw new Error(m.type);}},storage:{local:{get:async()=>({})}}};

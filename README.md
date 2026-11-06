@@ -1,80 +1,88 @@
 # NEEDLEDROP · Green Shoe Garage
 
-**Version 1.0.0-rc.2 — a Chrome extension for making a pocket-sized music collection.**
+**1.1.0-rc.1 — paste a YouTube video or playlist link and save MP3s.**
 
-Find media on a page, save original MPEG Audio Layer III (MP3) files, extract audio from video, or record the sound playing in a selected tab. The converter and all processing run on your computer.
+The main screen accepts YouTube, YouTube Music, youtu.be, Shorts, and playlist links. A small local Mac helper uses yt-dlp and FFmpeg to download and convert audio, then saves the MP3s directly to `~/Downloads/NEEDLEDROP`. No NEEDLEDROP account or conversion server.
 
-## Install on your Mac or PC
+## Install or update the extension
 
-1. Unzip this package into a permanent folder. Keep the whole folder together.
-2. In desktop Google Chrome, open `chrome://extensions`.
-3. Turn on **Developer mode** in the upper-right corner.
-4. Click **Load unpacked**, then select the unzipped **NEEDLEDROP** folder itself. `manifest.json` is now directly inside it.
-5. Open the puzzle-piece Extensions menu and pin **NEEDLEDROP**.
-6. Visit a media page and click the NEEDLEDROP record icon. Its workbench opens in another tab.
+1. Unzip into a permanent folder. Keep its contents together.
+2. Open `chrome://extensions` in desktop Google Chrome 116+.
+3. Turn on **Developer mode**, choose **Load unpacked**, and select **NEEDLEDROP**, the folder directly containing `manifest.json`.
+4. Pin the extension through Chrome’s puzzle-piece menu, then click its toolbar icon.
 
-Requires desktop Chrome 116 or newer. No Node.js, build step, account, paid service or web server is needed to use the supplied extension. Managed browsers may block unpacked extensions; use a browser/profile where your administrator permits extension development.
+If Chrome reports a missing manifest, select the folder that actually contains `manifest.json`, not the ZIP or its parent. There is no inner `extension` directory in this package.
 
-### Update an existing installation
+**Updating:** finish active jobs, copy the new package’s contents into the folder Chrome already loads, replacing matching files, then click **Reload** and reopen NEEDLEDROP. Keep the same installed extension to preserve its ID and tape shelf. An older RC1 installation may load `~/Desktop/NEEDLEDROP/extension`; copy the new contents into that existing folder. Accept the native messaging permission if Chrome asks.
 
-To retain your tape shelf, copy the **contents** of the new NEEDLEDROP folder into the folder Chrome already loads, replacing matching files. For an installation made from the first package, that is typically `~/Desktop/NEEDLEDROP/extension`. Then click the extension's **Reload** button at `chrome://extensions` and reopen its workbench. Finish and save any active take before reloading. Do not remove the installed extension just to update it; removal deletes its local shelf.
+## One-time YouTube setup on a Mac
 
-For a fresh installation, the new package needs only its top-level NEEDLEDROP folder. It no longer has an inner extension folder.
+The YouTube workflow requires the included native helper; loading the extension alone does not install it.
 
-## Use it
+1. In NEEDLEDROP, expand **One-time Mac setup**, then **Copy ID**.
+2. Double-click **Install-Mac.command** in the extracted folder. Paste the copied ID at the prompt.
+3. The installer uses [Homebrew](https://brew.sh) to install Python, yt-dlp, FFmpeg and Deno. If Homebrew is missing, install it from its official site first, then rerun this installer. Initial dependency installation can take several minutes.
+4. Return to NEEDLEDROP and click **Check connection**. The screen should say **HELPER CONNECTED**.
 
-| Task | Steps |
+If macOS will not open the script, open Terminal, type `bash` followed by a space, drag `Install-Mac.command` into that window, and press Return. The script remains visible and inspectable; no administrator password is needed for NEEDLEDROP’s own helper registration. Homebrew’s initial installation may have its own requirements.
+
+This helper installer supports **macOS + Google Chrome**. Page scanning, local conversion and recording remain available in desktop Chrome on other systems, but this release does not include Windows/Linux native-host installers.
+
+## Paste and download
+
+1. Paste a link, for example `https://music.youtube.com/watch?v=gSS2IgnnBo8`.
+2. Leave **Detect from link** selected, choose quality if desired, and click **Get MP3**.
+3. Watch progress and use **Open folder** when finished. Copy the MP3s to your player using its normal file-transfer or sync method.
+
+| Link or setting | Result |
 | --- | --- |
-| Find page media | Click the icon on the source page. Play the media once, then click **Scan page**. |
-| Download an existing MP3 | Click **Save MP3** beside a result. The original file is downloaded without re-encoding. |
-| Extract audio from video | Click **Make MP3** beside a file result, or drop a local video into **Bring your own**. |
-| Convert a direct media link | Paste the media file’s Uniform Resource Locator (URL), then choose **Make MP3**. Allow the requested media host if prompted. |
-| Record a player or stream | Start playback, click **Record tab**, then **Stop & make MP3** when finished. Pause/resume is available. |
-| Get the finished file | Preview the track on **Your tape shelf**, then click **Save MP3**. Check Chrome’s Downloads for completion. |
-| Switch source pages | Click the extension icon while on the new source page. An ongoing take continues recording its original tab. |
-| Forget permissions | Expand **How it works & what to expect**, then click **Forget granted media hosts**. |
+| Video or YouTube Music track | One MP3 |
+| Playlist URL | Separate, numbered MP3s in playlist order |
+| Video URL that also contains `list=` | One video by default; choose **Full playlist** to download the playlist |
+| Playlist limit | First 100 entries by default; adjustable from 1 to 500 |
+| Quality | 128, 192, 256 or 320 kbps; default 192 kbps |
+| MP3 format | 44.1 kHz stereo, ID3v2.3 metadata from the source when available |
+| Cancel | Stops the job and keeps completed MP3s |
+| Unavailable playlist entry | Reports an error and continues where yt-dlp can continue |
 
-For a typical older player: use the default **192 kbps** (kilobits per second), save the MP3, connect the player over Universal Serial Bus (USB), and copy the file to its Music folder. Some players, including older iPods, require their own synchronization software.
+Each job gets a dated subfolder inside `~/Downloads/NEEDLEDROP`, plus a `NEEDLEDROP-job.json` receipt. Tracks include their video ID in the filename. Higher bitrates do not improve the original source quality. The native downloader’s settings are separate from the optional trim/title controls in More tools.
 
-## What is included
+One YouTube job runs at a time. Keep Chrome running. Closing only the workbench is designed to let the job continue through the service worker’s native port, but real Mac browser acceptance of that behavior remains outstanding. Quitting Chrome, reloading the extension or disconnecting the helper ends the active job; completed files remain on disk. There is a two-hour job timeout. A playlist cap counts entries inspected, so unavailable entries can yield fewer MP3s than the cap. Radio/mix playlists can change; the cap prevents an unbounded download.
 
-- Page scanning: audio/video elements, source tags, direct links, Open Graph media metadata, open shadow roots and recognizable media URLs in the page’s resource history. Results are deduplicated.
-- Scan accessible frames on the selected page. Cross-origin frames can remain inaccessible.
-- Original MP3 downloads with Chrome’s Save As dialog.
-- Local FFmpeg WebAssembly conversion of common video/audio containers, including tested MP4/AAC and WebM/Opus inputs.
-- The first audio track is used; video is discarded.
-- Constant bitrate MP3 at 128, 192, 256 or 320 kbps; 44.1 kilohertz (kHz), stereo, ID3 version 2.3 tags.
-- Optional title, artist and album; trim file conversions using start/end seconds.
-- Tab recording with an elapsed timer, level meter, pause, resume, stop and discard.
-- Protected-media detection is advisory: it no longer prevents an attempt using Chrome’s standard audio capture. There is no decryption or protection bypass.
-- A warning appears after 10 seconds without an audio signal. A silent take is flagged for preview; silence can mean paused/muted playback, a quiet passage, or capture restrictions. The warning is not a DRM diagnosis.
-- Background processing: closing the workbench does not intentionally stop a job. Keep Chrome running and the source tab open while recording.
-- Persistent local shelf, preview player, explicit download and per-item removal.
-- If a finished tab recording fails to convert, its WebM backup remains on the shelf for saving or retrying.
+## Maintenance and troubleshooting
 
-## Limits and honest expectations
+- **Helper not connected:** run Install-Mac.command with the current extension ID, then Check connection. Reinstalling the extension or moving its unpacked directory may change its ID.
+- **Downloads start failing after a YouTube change:** close Chrome, run **Update-Mac.command**, reopen Chrome and check the connection. It updates the local tools and refreshes helper registration.
+- **Sign-in, region or unavailable errors:** inspect Download details. This version does not import browser cookies or support an account login. Public links can also be subject to YouTube availability or network restrictions.
+- **Protected media:** this is not a DRM decrypter. Paid/licensed streams and other restricted items are not guaranteed to work. Use material you own or have permission to save.
+- **Dependency missing:** rerun the installer. It checks yt-dlp, FFmpeg/ffprobe and Deno paths.
+- **Managed Chrome:** enterprise policy may block unpacked extensions or native messaging; installation requires a profile where those features are permitted.
+- **No file found:** open the job folder. Native YouTube downloads go directly to disk; they do not appear in the extension’s separate local tape shelf.
 
-“Any video source” cannot be guaranteed by a Chrome extension. Digital Rights Management (DRM), browser restrictions, private players and server access rules can prevent downloading or capture. NEEDLEDROP does not remove protection, decrypt streams or bypass logins/paywalls. Use material you own or have permission to save.
+To remove the helper, quit Chrome and remove `~/Library/Application Support/NEEDLEDROP` and `~/Library/Application Support/Google/Chrome/NativeMessagingHosts/com.greenshoegarage.needledrop.json`. This does not delete downloaded MP3s or shared Homebrew tools.
 
-- **Direct file conversions:** at most 200 mebibytes (MiB), shown as 200 MB in the interface. Large inputs can still exceed browser memory. Conversion has a five-minute processing timeout.
-- **Recording:** at most 60 minutes per take and 200 MiB of compressed input. It runs in real time and records all audible sounds from the selected tab, including ads or notifications from that tab. It does not record your microphone or other tabs.
-- **Streams:** HTTP Live Streaming (HLS), Dynamic Adaptive Streaming over HTTP (DASH), and Media Source Extensions (MSE) blob sources use tab recording; this release does not assemble streaming segments.
-- **Network conversion:** host permission is requested for the chosen source host. Redirects are refused; supply the final media URL or use recording/local files. Credentials already available to the browser may be used by the host, but no authentication is bypassed.
-- **Browser pages:** Chrome settings, the Web Store and other restricted pages cannot be scanned or recorded.
-- **Local files:** use the drop zone. Scanning `file://` pages is not supported.
-- **Durability:** completed files survive normal restarts in extension storage. Active recordings are held in memory until stopped. Browser shutdown, crash or extension reload can lose an unfinished take. Download keepers before uninstalling or clearing extension storage.
-- **One conversion or recording at a time.** Original MP3 downloads are independent.
-- Trimming and re-encoding do not improve the quality of the source.
+## More tools
 
-## Verification status
+Expand **More tools: page scanning, local files & tab recording** for the original workbench:
 
-This is a release candidate. The bundled converter was executed and its MP3 output independently inspected. Automated checks cover discovery, validation, storage, interface wiring, the actual encoder worker, recording state transitions with synthetic media, cancellation and error recovery.
+- Scan a page for direct MP3, audio and video links. Direct MP3s save unchanged through Chrome.
+- Drop a local video/audio file, or paste a direct media-file URL, to convert it with bundled FFmpeg WebAssembly.
+- Record the selected tab in real time, with pause/resume, a level meter and a silence warning.
+- Preview and save finished local conversions/recordings from **Your tape shelf**.
 
-**Live installation and tab-capture acceptance remain unverified:** the available Chromium test environment blocks unpacked extension installation by policy. No claim of live browser recording acceptance is made. See `TEST-REPORT.md` for exact coverage and a short installation acceptance procedure.
+Local file conversion is limited to 200 MiB and a five-minute processing timeout. Recording is limited to 60 minutes and 200 MiB of compressed input. It captures the selected tab, not your microphone. Streaming/blob sources found by page scanning use recording; the native YouTube downloader handles supported YouTube links separately.
 
-## Source and development
+Protected-media detection is advisory for ordinary Chrome tab capture. Chrome or the service may refuse capture or provide silence; the extension cannot guarantee audible output. Preview recordings before keeping them. Browser shutdown can lose unfinished recordings, and uninstalling deletes the extension-local tape shelf. Download keepers first.
 
-The editable extension source and `manifest.json` are at the package root; tests are in `tests/`.
+## Verification
+
+This is a **release candidate**. Automated JS and Python checks passed. The real yt-dlp/FFmpeg pipeline was run against a generated local MP4 fixture; ffprobe verified a 192 kbps MP3, 44.1 kHz stereo, and ID3v2.3 tags. The bundled browser encoder also passed real MP4/WebM conversion checks.
+
+**Not yet verified:** live macOS Chrome installation, native messaging in Chrome, and a successful download of the supplied YouTube URL. The test environment blocked unpacked extensions, and the attempted YouTube request failed certificate validation. Local and simulated checks are not presented as live website acceptance. See TEST-REPORT.md.
+
+## Development
+
+Extension source and manifest are at the package root; native helper source is in `native/`.
 
 ```sh
 npm ci
@@ -82,8 +90,8 @@ npm test
 npm run build
 ```
 
-Node.js 22+ is recommended for development. Encoder tests also use local `ffprobe` from FFmpeg to independently check output. Test fixtures are generated tones, not commercial media. `npm run build` refreshes pinned bundled encoder files; it makes no application network requests at runtime.
+Development checks use Node.js 22+, Python 3.11+, and FFmpeg/ffprobe. Tests use synthetic tones; the Python helper tests use a controlled subprocess, with separate real yt-dlp conversion verification. The extension is prebuilt; normal use requires no npm or build step.
 
-Original NEEDLEDROP code is provided under the GNU General Public License (GPL), version 2 or later. Third-party components retain their own notices and licenses. See `THIRD-PARTY-NOTICES.md` and `licenses/`.
+Original code: GPL-2.0-or-later. See THIRD-PARTY-NOTICES.md and licenses/. yt-dlp, FFmpeg, Deno and Python are installed independently through Homebrew and retain their own licenses.
 
 Make. Hack. Learn. Share. Love. Repeat.

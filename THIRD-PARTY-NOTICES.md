@@ -19,3 +19,16 @@ Technical references:
 - https://developer.chrome.com/docs/extensions/reference/api/offscreen
 - https://developer.chrome.com/docs/extensions/develop/concepts/network-requests
 - https://ffmpegwasm.netlify.app/docs/getting-started/usage/
+
+
+## Native YouTube helper dependencies
+
+The native helper invokes independently installed programs; their binaries are not bundled in this ZIP. Install-Mac.command and Update-Mac.command use Homebrew to manage them:
+
+- yt-dlp: https://github.com/yt-dlp/yt-dlp — Unlicense; dependencies retain their own licenses.
+- FFmpeg/ffprobe: https://ffmpeg.org/ — configuration-dependent LGPL/GPL licensing. Homebrew package is installed separately.
+- Deno: https://github.com/denoland/deno — MIT.
+- Python: https://www.python.org/ — Python Software Foundation license.
+- Homebrew: https://brew.sh — BSD 2-Clause.
+
+YouTube extraction support can change independently of NEEDLEDROP. Current upstream setup references: https://github.com/yt-dlp/yt-dlp/wiki/EJS and https://developer.chrome.com/docs/extensions/develop/concepts/native-messaging .

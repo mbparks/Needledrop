@@ -1,5 +1,6 @@
 import {scanPage} from './scanner.js';
 import {filename,httpURL,hostPattern} from './common.js';
+import {nativeRequest,nativeStatus} from './native-client.js';
 let creating;
 async function hasOffscreen() { return (await chrome.runtime.getContexts({contextTypes:['OFFSCREEN_DOCUMENT']})).length>0; }
 async function ensureOffscreen() {
@@ -32,6 +33,11 @@ async function scan(tabId) {
   return {items:[...items.values()],protectedMedia,embedded};
 }
 async function handle(m) {
+  if (m.type==='native-status') return {state:nativeStatus()};
+  if (m.type==='native-check') return nativeRequest('ping');
+  if (m.type==='native-start') return nativeRequest('start',{url:m.url,mode:m.mode,quality:m.quality,limit:m.limit});
+  if (m.type==='native-cancel') return nativeRequest('cancel');
+  if (m.type==='native-folder') return nativeRequest('open_folder');
   if (m.type==='source') return {source:(await chrome.storage.session.get('source')).source||null};
   if (m.type==='scan') return scan(m.tabId);
   if (m.type==='status') return await hasOffscreen()?offscreen('status'):{state:{phase:'idle',message:'Ready when you are.'}};

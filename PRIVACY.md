@@ -1,11 +1,15 @@
 # NEEDLEDROP privacy
 
-NEEDLEDROP has no backend, analytics, telemetry, advertising or account system. No audio or video is uploaded for conversion. Its encoder is bundled locally.
+No NEEDLEDROP backend, account, analytics, advertising or remote conversion is used.
 
-The extension reads media references only when opened for a page or when Scan page is selected. It can request the specific media host needed for a conversion. That host receives ordinary network requests, and normal browser credentials may accompany the request. Direct downloads go through Chrome’s download manager.
+**YouTube downloads:** after you click Get MP3, the local helper runs yt-dlp and FFmpeg. yt-dlp connects to YouTube and its media servers; those services receive ordinary download requests and your network address. No browser cookies or passwords are read or copied. The helper ignores external yt-dlp configuration and plugin directories. Homebrew contacts its package sources when you run the installer or updater; those tools have their own policies.
 
-Tab capture begins only after Record tab is selected. It captures the selected tab’s audio, not the microphone. Chrome provides its own capture indicator. The workbench displays recording state, duration and controls.
+The helper uses Chrome native messaging, with no web server or listening network port. Registration permits only the extension ID you provide. The extension accepts privileged requests only from its own workbench. The helper accepts fixed operations and validated YouTube URLs, and executes the downloader as an argument list without a shell.
 
-Completed files remain in this extension’s IndexedDB storage until removed. Source-tab selection is held in session storage. Quality, artist and album preferences can be held in local extension storage. Chrome’s Downloads records downloads normally. Uninstalling removes extension-local data, but not downloaded files.
+Completed MP3s and a job receipt containing filenames, errors and output location are saved under ~/Downloads/NEEDLEDROP. The receipt may include source identifiers in error text. Helper configuration contains tool locations, output folder and extension ID under ~/Library/Application Support/NEEDLEDROP. Uninstalling the extension does not remove these files.
 
-Permissions: activeTab and scripting read the selected page on invocation; tabCapture captures its audio; offscreen supports background recording/conversion; downloads saves chosen files; storage keeps source selection and preferences. Optional host permissions allow fetching media only from hosts you grant. No permanent blanket website access is requested on installation.
+**More tools:** page scanning reads media references on request. Direct media conversion asks permission for its source host; normal browser credentials may accompany that request. Local files and tab recordings are converted using bundled WebAssembly in Chrome. No media is uploaded for conversion. Direct downloads use Chrome’s Downloads.
+
+Tab capture starts only when selected, captures the selected tab’s audio rather than the microphone, and uses Chrome’s capture indicator. Completed browser conversions remain in extension IndexedDB until removed; source selection uses session storage and preferences use extension-local storage. Uninstalling deletes that local shelf but not files already downloaded.
+
+Permissions: activeTab and scripting access the selected page; tabCapture and offscreen support recording/conversion; downloads saves selected files; storage holds state/preferences; nativeMessaging connects to the installed Mac helper. Optional host permissions allow direct conversion only from granted hosts. No blanket website permission is requested at installation.

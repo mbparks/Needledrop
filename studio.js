@@ -1,5 +1,6 @@
 import {MAX_BYTES,busy,filename,httpURL,hostPattern,settings,size,clock} from './common.js';
 import {put,get,remove,assetList} from './db.js';
+import {initYouTube} from './youtube-ui.js';
 const $=s=>document.querySelector(s);
 let source=null,items=[],state={phase:'idle'},shelfSignature='',previews=[],scanBusy=false,starting=false,lastPhase='',lastSourceId=null;
 async function send(type,data={}) {const r=await chrome.runtime.sendMessage({target:'background',type,...data});if(!r?.ok)throw new Error(r?.error||'The extension did not respond.');return r;}
@@ -14,7 +15,7 @@ function sourceView() {
 }
 async function getSource() {
   const next=(await send('source')).source;
-  if(next?.id!==source?.id||next?.url!==source?.url){source=next;items=[];renderMedia();sourceView();if(source&&lastSourceId!==source.id){lastSourceId=source.id;await doScan();}}
+  if(next?.id!==source?.id||next?.url!==source?.url){source=next;items=[];renderMedia();sourceView();if(source&&lastSourceId!==source.id&&$('.advanced').open){lastSourceId=source.id;await doScan();}}
 }
 async function doScan() {
   if(!source||scanBusy)return;
@@ -98,6 +99,7 @@ async function renderShelf(force=false) {
 let polling=false;
 async function poll(){if(polling)return;polling=true;try{state=(await send('status')).state;renderState();await getSource();}finally{polling=false;}}
 $('#scan').onclick=safe(doScan);$('#filter').oninput=renderMedia;$('#type-filter').onchange=renderMedia;
+$('.advanced').ontoggle=safe(async()=>{if($('.advanced').open&&source&&!items.length)await doScan();});
 $('#visit').onclick=safe(async()=>{const t=await chrome.tabs.update(source.id,{active:true});await chrome.windows.update(t.windowId,{focused:true});});
 $('#record').onclick=safe(record);$('#pause').onclick=safe(()=>send(state.phase==='paused'?'resume':'pause'));$('#stop').onclick=safe(()=>send('stop'));
 $('#cancel').onclick=safe(async()=>{if(['recording','paused'].includes(state.phase)&&!confirm('Discard this recording? Use Stop & make MP3 to keep it.'))return;await send('cancel');await poll();});
@@ -108,3 +110,4 @@ $('#refresh-shelf').onclick=safe(()=>renderShelf(true));
 $('#permissions').onclick=safe(async()=>{const {origins=[]}=await chrome.permissions.getAll();const http=origins.filter(o=>/^https?:/.test(o));if(http.length)await chrome.permissions.remove({origins:http});notify('Granted media hosts have been forgotten. Future URL conversions will ask again.');});
 async function init(){const {preferences}=await chrome.storage.local.get('preferences');if(preferences)for(const k of ['bitrate','artist','album'])if(preferences[k])$('#'+k).value=preferences[k];await renderShelf(true);await poll();setInterval(()=>poll().catch(e=>notify(e.message)),1000);}
 init().catch(e=>notify(e.message));
+initYouTube(send);
